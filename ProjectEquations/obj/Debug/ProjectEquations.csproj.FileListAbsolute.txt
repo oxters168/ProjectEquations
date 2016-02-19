@@ -1,0 +1,8 @@
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\bin\Debug\ProjectEquations.exe.config
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\bin\Debug\ProjectEquations.exe
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\bin\Debug\ProjectEquations.pdb
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\obj\Debug\ProjectEquations.csprojResolveAssemblyReference.cache
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\obj\Debug\ProjectEquations.Properties.Resources.resources
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\obj\Debug\ProjectEquations.csproj.GenerateResource.Cache
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\obj\Debug\ProjectEquations.exe
+C:\Users\oxter\OneDrive\Projects\VisualStudio\ProjectEquations\ProjectEquations\obj\Debug\ProjectEquations.pdb
