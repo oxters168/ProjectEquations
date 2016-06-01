@@ -1,18 +1,16 @@
 ﻿using OxMath;
 using System;
-//using System.Collections.Generic;
+using System.Collections.Generic;
 
 public class Generator
 {
-    public const byte SEPERATOR = 3;
+    public const byte BASE = 2, SEPERATOR = 0;
     public enum SeedType
     {
+        COMPRESSED,
         SBYTE,
-        BYTE,
         SHORT,
-        USHORT,
         INT,
-        UINT,
         LONG,
         FLOAT,
         DOUBLE,
@@ -105,7 +103,7 @@ public class Generator
             if (number is double) info += (byte)SeedType.DOUBLE;
             else if (number is float) info += (byte)SeedType.FLOAT;
         }
-        else if (number is sbyte || number is byte || number is short || number is ushort || number is int || number is uint || number is long)
+        else if (number is sbyte || number is short || number is int || number is long)
         {
             long castedNumber = Convert.ToInt64(number);
 
@@ -115,11 +113,8 @@ public class Generator
             else info += (byte)Sign.POSITIVE;
 
             if (number is sbyte) info += (byte)SeedType.SBYTE;
-            else if (number is byte) info += (byte)SeedType.BYTE;
             else if (number is short) info += (byte)SeedType.SHORT;
-            else if (number is ushort) info += (byte)SeedType.USHORT;
             else if (number is int) info += (byte)SeedType.INT;
-            else if (number is uint) info += (byte)SeedType.UINT;
             else if (number is long) info += (byte)SeedType.LONG;
         }
         else if (number is infinint)
@@ -136,6 +131,101 @@ public class Generator
 
         seed.AppendToEnd((infinint)info);
 
-        return seed;
+        byte compressionBase = 2;
+        infinint power = 0;
+        infinint offset = 0;
+        for (; compressionBase < 20; compressionBase++)
+        {
+            power = infinint.Log(compressionBase, seed);
+            infinint powered = infinint.Pow(compressionBase, power);
+            offset = new infinint(seed - powered);
+            Console.WriteLine("seed: " + seed + " base: " + compressionBase + " power: " + power + " powered: " + powered + " offset: " + offset);
+        }
+        //infinint power = infinint.Log(BASE, seed) - 1;
+        //infinint powered = infinint.Pow(BASE, power);
+        //infinint offset = new infinint(seed - powered);
+        //Console.WriteLine("seed: " + seed + " power: " + power + " powered: " + powered + " offset: " + offset);
+        
+        offset.AppendToEnd(SEPERATOR);
+        info = infinint.DecimalToOctal(power).ShiftNumbers(1).ToString();
+        info += (byte)SeedType.COMPRESSED;
+        offset.AppendToEnd((infinint)info);
+
+        return offset;
+    }
+    public static object GenerateNumberFromSeed(infinint seed)
+    {
+        object number = null;
+        SeedType seedType = (SeedType)seed.DigitAt(seed.length - 1);
+        infinint seedCopy = new infinint(seed);
+        seedCopy.RemoveAt(seedCopy.length - 1);
+
+        Console.WriteLine(seedType);
+
+        if (seedType == SeedType.COMPRESSED)
+        {
+            byte nextDigit = seedCopy.DigitAt(seedCopy.length - 1);
+            seedCopy.RemoveAt(seedCopy.length - 1);
+            infinint power = nextDigit;
+
+            while (nextDigit != SEPERATOR)
+            {
+                nextDigit = seedCopy.DigitAt(seedCopy.length - 1);
+                seedCopy.RemoveAt(seedCopy.length - 1);
+                
+                if(nextDigit != SEPERATOR) power.AppendToBeginning(nextDigit);
+            }
+            
+            power.ShiftNumbers(-1);
+            power = infinint.OctalToDecimal(power);
+
+            Console.WriteLine(seedCopy + " + " + BASE + "^" + power);
+            number = new infinint(infinint.Pow(BASE, power) + seedCopy);
+        }
+        else if (seedType == SeedType.FLOAT || seedType == SeedType.DOUBLE)
+        {
+
+        }
+        else if (seedType == SeedType.SHORT || seedType == SeedType.INT || seedType == SeedType.LONG)
+        {
+
+        }
+        else if(seedType == SeedType.INFININT)
+        {
+
+        }
+
+        return number;
+    }
+
+    public static void GetCombinations(int number, int numberOfNumbers, byte key)
+    {
+        if (number > 0 && numberOfNumbers > 1 && key > 1 && key < 10)
+        {
+            //byte[] decimalKey = { 0, (byte)(1 * key), (byte)(2 * key), (byte)(3 * key), (byte)(4 * key), (byte)(5 * key), (byte)(6 * key), (byte)(7 * key), (byte)(8 * key), (byte)(9 * key) };
+            List<int[]> validCombinations = new List<int[]>();
+
+            TCombinator combinator = new TCombinator(9, numberOfNumbers - 1);
+            Console.WriteLine(combinator.CalcCombNum(9, (ulong)numberOfNumbers - 1));
+
+            int combinationNumber = 1;
+            while(!combinator.Finished)
+            {
+                Console.Write(combinationNumber + ": ");
+                int[] combination = combinator.CombSet;
+                int sum = 0;
+                foreach (int comb in combination)
+                {
+                    Console.Write(comb * key + " ");
+                    sum += comb * key;
+                }
+                if (sum == number) validCombinations.Add(combination);
+                combinator.NextCombin();
+                Console.WriteLine("= " + sum);
+                combinationNumber++;
+            }
+            Console.WriteLine("Valid Combinations: " + validCombinations.Count);
+        }
+        else Console.WriteLine("Bad Number or Length or Key");
     }
 }
